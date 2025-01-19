@@ -1,15 +1,32 @@
-// my main app
-// server.mjs
-import { createServer } from 'node:http';
+const express = require('express');
+const {sequelize} = require('./utils/database');
+const productRoutes = require('./routes/products');
 
-const server = createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Hello World!\n');
+
+const app = express();
+const PORT = 3000;
+app.set('view engine', 'ejs');
+
+app.use('/products', productRoutes);
+
+app.get('/', (request, response) => {
+  response.write('Home Page');
+  response.end();
 });
 
-// starts a simple http server locally on port 3000
-server.listen(3000, '127.0.0.1', () => {
-  console.log('Listening on 127.0.0.1:3000');
+app.get('/stores', (request, response) => {
+    response.write('List of all available stores');
+    response.end();
+})
+
+
+app.listen(PORT, async () => {
+    console.log('server started');
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+      } catch (error) {
+        console.error('Unable to connect to the database:', error);
+      }
 });
 
-// run with `node server.mjs`
